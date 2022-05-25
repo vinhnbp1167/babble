@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
-import { ChatEngine } from 'react-chat-engine';
+import { ChatEngine, ChatHeader } from 'react-chat-engine';
 import { auth } from '../firebase';
 
 import { useAuth } from '../contexts/AuthContext';
 
 import LogoutIcon from '../assets/logout.png'
 import axios from 'axios';
+import LocalPhoneIcon from '@mui/icons-material/LocalPhone';
 
 const Chats = () => {
     const history = useHistory();
@@ -18,7 +19,10 @@ const Chats = () => {
 
         history.push('/');
     }
-    console.log(user.photoURL);
+    
+    const handleCall = async () => {
+        console.log('hi');
+    }
 
     const getFile = async (url) => {
         const response = await fetch(url);
@@ -38,7 +42,7 @@ const Chats = () => {
             headers: {
                 "project-id": process.env.REACT_APP_CHAT_ENGINE_ID,
                 "user-name": user.email,
-                "user-secret": user.uid,
+                "user-secret": user.uid
             }
         })
         .then(() => setLoading(false))
@@ -52,7 +56,7 @@ const Chats = () => {
                 .then((avatar) => {
                     formdata.append('avatar', avatar, avatar.name)
 
-                    axios.post('https://api.chatengine.io/users',
+                    axios.post('https://api.chatengine.io/users/',
                         formdata,
                         { headers: { "private-key": process.env.REACT_APP_CHAT_ENGINE_KEY }}
                     )
@@ -63,6 +67,31 @@ const Chats = () => {
     }, [user, history]);
 
     // if (!user || loading) return "Loading...";
+
+    function renderHeader(chat) {
+        if (!chat) return <></>;
+        const date = new Date(chat.last_message.created);
+        return (
+            <div className='ce-chat-title-container'>
+                <div className='ce-chat-title-text'>
+                    {chat.title}
+                </div>
+                <div className='ce-chat-subtitle-text'>
+                    Active {date.toLocaleDateString('en', {
+                        hour: 'numeric',
+                        minute: 'numeric',
+                        year: 'numeric',
+                        month: 'short',
+                        day: '2-digit',
+                        localeMatcher: 'lookup'
+                    })}
+                </div>
+                <div className='logout-tab' onClick={handleCall}>
+                    <LocalPhoneIcon style={{ fill: '#002766' }} />
+                </div>
+            </div>
+        )
+    }
 
     return (
         <div className='chats-page'>
@@ -83,6 +112,8 @@ const Chats = () => {
                 projectID={process.env.REACT_APP_CHAT_ENGINE_ID}
                 userName={user.email}
                 userSecret={user.uid}
+                renderChatHeader={(chat) => renderHeader(chat)}
+                offset={-4}
             />
         </div>
     )
