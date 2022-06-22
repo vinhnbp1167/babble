@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
-import { ChatEngine, ChatHeader } from 'react-chat-engine';
+import { ChatEngine } from 'react-chat-engine';
 import { auth } from '../firebase';
 
 import { useAuth } from '../contexts/AuthContext';
@@ -9,7 +9,7 @@ import LogoutIcon from '../assets/logout.png'
 import axios from 'axios';
 import LocalPhoneIcon from '@mui/icons-material/LocalPhone';
 
-const Chats = () => {
+const Chats = (props) => {
     const history = useHistory();
     const { user } = useAuth();
     const [loading, setLoading] = useState(true);
@@ -20,14 +20,15 @@ const Chats = () => {
         history.push('/');
     }
     
-    const handleCall = async () => {
-        console.log('hi');
+    function handleCall (chatId) {
+        const id = chatId;
+        props.history.push(`/room/${id}`);
+        return;
     }
 
     const getFile = async (url) => {
         const response = await fetch(url);
         const data = await response.blob();
-
         return new File([data], "userPhoto.jpg", { type: 'image/jpeg' })
     }
 
@@ -86,8 +87,8 @@ const Chats = () => {
                         localeMatcher: 'lookup'
                     })}
                 </div>
-                <div className='logout-tab' onClick={handleCall}>
-                    <LocalPhoneIcon style={{ fill: '#002766' }} />
+                <div className='logout-tab'>
+                    <LocalPhoneIcon style={{ fill: '#002766' }} onClick={() => handleCall(chat.id)} />
                 </div>
             </div>
         )

@@ -4,7 +4,9 @@ import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 
 import { AuthProvider } from "./contexts/AuthContext";
 
-import { Chats, Auth } from './components';
+import { createBrowserHistory } from 'history';
+
+import { Chats, Auth, Room } from './components';
 
 function App() {
   return (
@@ -12,7 +14,8 @@ function App() {
       <Router>
         <AuthProvider> 
           <Switch>
-            <Route path="/chats" component={Chats} /> 
+            <Route path="/chats" exact component={Chats} /> 
+            <Route path="/room/:roomID" component={Room} />
             <Route path="/" component={Auth} /> 
           </Switch>
         </AuthProvider> 
